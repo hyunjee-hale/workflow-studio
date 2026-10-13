@@ -6,6 +6,8 @@ No install, account or server. Your diagrams stay on your own computer.
 
 ![Workflow Studio: a flowchart on the editing canvas, with Mermaid's own rendering of the same code in the Mermaid preview tab](docs/screenshot.png)
 
+**Try it online:** [hyunjee-hale.github.io/workflow-studio](https://hyunjee-hale.github.io/workflow-studio/), or download the repo and open `index.html` (see [Run it](#run-it)). The online version keeps its diagrams separately from copies you open from your disk.
+
 > **Beta, built with AI.** This project was developed with Claude, and I haven't reviewed the code line by line yet. Read [DISCLAIMER.md](DISCLAIMER.md) before you rely on it.
 
 ## Why I built this
