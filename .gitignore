@@ -1,0 +1,29 @@
+# Your own diagrams, if you save them inside this folder (README suggests a "diagrams" folder)
+diagrams/
+my-diagrams/
+*.mmd
+workflow-studio.json
+workflow-studio.damaged-*.json
+workflow-studio-*.json
+
+# Third-party libraries downloaded for offline use (see README, "Working offline")
+lib/
+
+# Secrets (none are needed for this project; this is a safety net)
+.env
+.env.*
+!.env.example
+*_secret*
+*_credentials*
+*.pem
+*.key
+
+# Editor, OS and tooling clutter
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+node_modules/
+playwright-report/
+test-results/

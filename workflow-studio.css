@@ -1,0 +1,1144 @@
+/* Workflow Studio styles.
+   Every rule is scoped under #wfs-root and every class/id carries a "wfs-" prefix, so the same file can sit
+   inside a host page without restyling it or being restyled by it.
+   Layout: top bar, then a dotted-grid canvas (left) beside a Code / Preview / History panel (right);
+   stacks when the studio itself is narrower than 820px (container query, not viewport). */
+#wfs-root {
+  --bg: #eef1ef;
+  --panel: #ffffff;
+  --ink: #1b2127;
+  --muted: #5b6670;
+  --line: #d6dcd8;
+  --dot: #c3cbc6;
+  --accent: #0d6a76;
+  --accent-ink: #ffffff;
+  --accent-soft: #d9eeee;
+  --sel: #d9761c;
+  --node: #ffffff;
+  --node-stroke: #36424b;
+  --edge: #4a5862;
+  --sg: #e3e9e5;
+  --sg-stroke: #9aa8a1;
+  --danger: #b3262f;
+  --ok: #2c7a4b;
+  --add: #e0f2e6;
+  --del: #fbe3e4;
+  --codebg: #f7f8f6;
+  --ui: 'Figtree', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  #wfs-root:not([data-theme='light']) {
+    --bg: #121618;
+    --panel: #1a1f22;
+    --ink: #e3e8eb;
+    --muted: #97a3ab;
+    --line: #2b3338;
+    --dot: #2f383d;
+    --accent: #55c2cd;
+    --accent-ink: #0a1517;
+    --accent-soft: #173a3e;
+    --sel: #f0a14f;
+    --node: #1f262a;
+    --node-stroke: #a9b6be;
+    --edge: #99a7b0;
+    --sg: #1a2326;
+    --sg-stroke: #4a5a5f;
+    --danger: #f07a83;
+    --ok: #6fcf95;
+    --add: #16301f;
+    --del: #3a1b1e;
+    --codebg: #161b1d;
+    color-scheme: dark;
+  }
+}
+#wfs-root[data-theme='dark'] {
+  --bg: #121618;
+  --panel: #1a1f22;
+  --ink: #e3e8eb;
+  --muted: #97a3ab;
+  --line: #2b3338;
+  --dot: #2f383d;
+  --accent: #55c2cd;
+  --accent-ink: #0a1517;
+  --accent-soft: #173a3e;
+  --sel: #f0a14f;
+  --node: #1f262a;
+  --node-stroke: #a9b6be;
+  --edge: #99a7b0;
+  --sg: #1a2326;
+  --sg-stroke: #4a5a5f;
+  --danger: #f07a83;
+  --ok: #6fcf95;
+  --add: #16301f;
+  --del: #3a1b1e;
+  --codebg: #161b1d;
+  color-scheme: dark;
+}
+#wfs-root[data-theme='light'] {
+  color-scheme: light;
+}
+
+/* host page (standalone only: <html class="wfs-page">) */
+html.wfs-page,
+html.wfs-page body {
+  height: 100%;
+  margin: 0;
+  background: #eef1ef;
+}
+@media (prefers-color-scheme: dark) {
+  html.wfs-page:not([data-theme='light']) body {
+    background: #121618;
+  }
+}
+
+/* root box. Embedded by default (fixed height, framed); .wfs-full fills the window; .wfs-fixed is "Full screen" */
+#wfs-root {
+  display: block;
+  position: relative;
+  background: var(--bg);
+  color: var(--ink);
+  font: 14px/1.45 var(--ui);
+  text-align: left;
+  letter-spacing: normal;
+  white-space: normal;
+  height: var(--wfs-height, min(80vh, 780px));
+  min-height: 520px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+#wfs-root.wfs-full {
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+}
+#wfs-root.wfs-fixed {
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  height: auto;
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+}
+
+/* reset: neutralise host-page element styles (e.g. Bootstrap) inside the studio */
+#wfs-root,
+#wfs-root *,
+#wfs-root *::before,
+#wfs-root *::after {
+  box-sizing: border-box;
+}
+#wfs-root [hidden] {
+  display: none !important;
+}
+#wfs-root :is(h2, h3, p, ul, li, label) {
+  margin: 0;
+  padding: 0;
+  line-height: inherit;
+}
+#wfs-root :is(h2, h3) {
+  font-weight: 700;
+  color: inherit;
+}
+#wfs-root :is(button, select, input, textarea) {
+  font: inherit;
+  color: inherit;
+  margin: 0;
+  letter-spacing: normal;
+  text-transform: none;
+  box-shadow: none;
+  max-width: none;
+}
+#wfs-root button {
+  cursor: pointer;
+  line-height: 1.45;
+  text-align: center;
+}
+#wfs-root svg {
+  vertical-align: baseline;
+  overflow: hidden;
+}
+#wfs-root :focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+#wfs-root #wfs-app {
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
+  container: wfs / inline-size;
+}
+#wfs-root.wfs-full .wfs-only-embed {
+  display: none;
+}
+
+/* top bar */
+#wfs-root .wfs-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  padding-inline: 16px;
+  padding-block: 10px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+#wfs-root .wfs-brand {
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+#wfs-root .wfs-brand svg {
+  flex: none;
+}
+#wfs-root .wfs-docpick {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  min-width: 0;
+  flex: 1 1 280px;
+}
+#wfs-root .wfs-docpick select {
+  max-width: 180px;
+  min-width: 0;
+}
+#wfs-root #wfs-docName {
+  flex: 1 1 160px;
+  min-width: 0;
+  font-weight: 600;
+  font-size: 15px;
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: 6px;
+  padding: 5px 8px;
+}
+#wfs-root #wfs-docName:hover {
+  border-color: var(--line);
+}
+#wfs-root #wfs-docName:focus {
+  border-color: var(--accent);
+  background: var(--panel);
+}
+#wfs-root .wfs-chip {
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+#wfs-root .wfs-chip i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--muted);
+  display: inline-block;
+}
+#wfs-root .wfs-chip[data-s='saved'] i {
+  background: var(--ok);
+}
+#wfs-root .wfs-chip[data-s='saving'] i {
+  background: var(--sel);
+}
+#wfs-root .wfs-chip[data-s='warn'] i {
+  background: var(--danger);
+}
+#wfs-root .wfs-bar-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+  position: relative;
+  min-width: 0;
+  max-width: 100%;
+}
+#wfs-root .wfs-btn {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: 7px;
+  padding: 6px 11px;
+  font-weight: 600;
+  font-size: 13px;
+  white-space: nowrap;
+}
+#wfs-root .wfs-btn:hover {
+  border-color: var(--accent);
+}
+#wfs-root .wfs-btn.wfs-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+#wfs-root .wfs-btn.wfs-danger {
+  color: var(--danger);
+}
+#wfs-root .wfs-btn.wfs-danger.wfs-solid {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: var(--panel);
+}
+#wfs-root .wfs-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+#wfs-root select {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: 7px;
+  padding: 5px 8px;
+  font-size: 13px;
+}
+/* The browser draws a dropdown's open list itself. Give the options the theme colours, or dark-mode text can
+   land on the browser's white list background (the toolbar dropdowns have a transparent background). */
+#wfs-root select option,
+#wfs-root select optgroup {
+  background: var(--panel);
+  color: var(--ink);
+}
+#wfs-root .wfs-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.14);
+  padding: 6px;
+  display: grid;
+  min-width: 210px;
+  z-index: 30;
+}
+#wfs-root .wfs-menu button {
+  border: 0;
+  background: none;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+#wfs-root .wfs-menu button:hover {
+  background: var(--accent-soft);
+}
+#wfs-root .wfs-menu .wfs-sep {
+  height: 1px;
+  background: var(--line);
+  margin: 4px 2px;
+}
+
+/* work area */
+#wfs-root .wfs-work {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 38%);
+  min-height: 0;
+}
+#wfs-root .wfs-stage {
+  position: relative;
+  overflow: hidden;
+  min-height: 0;
+  background-color: var(--bg);
+  background-image: radial-gradient(var(--dot) 1.1px, transparent 1.2px);
+  touch-action: none;
+}
+#wfs-root #wfs-cv {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  user-select: none;
+  -webkit-user-select: none;
+}
+#wfs-root .wfs-side {
+  border-left: 1px solid var(--line);
+  background: var(--panel);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-height: 0;
+  min-width: 0;
+}
+@container wfs (max-width:820px) {
+  #wfs-root .wfs-work {
+    grid-template-columns: minmax(0, 1fr);
+    overflow: auto;
+    align-content: start;
+  }
+  #wfs-root .wfs-stage {
+    height: min(62vh, 560px);
+    min-height: 380px;
+  }
+  #wfs-root .wfs-side {
+    border-left: 0;
+    border-top: 1px solid var(--line);
+    min-height: 480px;
+  }
+}
+
+/* toolbar */
+#wfs-root .wfs-toolbar {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  pointer-events: none;
+  z-index: 5;
+}
+#wfs-root .wfs-toolbar > * {
+  pointer-events: auto;
+}
+#wfs-root .wfs-grp,
+#wfs-root .wfs-seg {
+  display: flex;
+  gap: 2px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 3px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+#wfs-root .wfs-tb {
+  border: 0;
+  background: none;
+  border-radius: 6px;
+  padding: 5px 9px;
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+#wfs-root .wfs-tb:hover {
+  background: var(--accent-soft);
+}
+#wfs-root .wfs-tb[aria-pressed='true'] {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+#wfs-root .wfs-tb.wfs-ic {
+  padding: 5px 7px;
+}
+#wfs-root .wfs-tb:disabled {
+  opacity: 0.4;
+  cursor: default;
+  background: none;
+}
+#wfs-root .wfs-tsel {
+  border: 0;
+  background: none;
+  font-size: 13px;
+  padding: 4px 4px;
+  max-width: 150px;
+}
+#wfs-root .wfs-zoom {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  z-index: 5;
+}
+#wfs-root .wfs-zoom .wfs-tb {
+  min-width: 30px;
+  justify-content: center;
+  font-variant-numeric: tabular-nums;
+}
+#wfs-root .wfs-hint {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  max-width: min(520px, calc(100% - 200px));
+  font-size: 12px;
+  color: var(--muted);
+  text-align: right;
+  z-index: 4;
+  pointer-events: none;
+  text-wrap: balance;
+}
+@container wfs (max-width:620px) {
+  #wfs-root .wfs-hint {
+    display: none;
+  }
+  #wfs-root .wfs-bar-actions {
+    width: 100%;
+  }
+  #wfs-root .wfs-docpick {
+    flex-basis: 100%;
+  }
+}
+
+/* canvas items */
+#wfs-root .wfs-nd {
+  cursor: grab;
+}
+#wfs-root .wfs-nd .wfs-sh {
+  fill: var(--node);
+  stroke: var(--node-stroke);
+  stroke-width: 1.5;
+}
+#wfs-root .wfs-nd .wfs-sh2 {
+  fill: none;
+  stroke: var(--node-stroke);
+  stroke-width: 1.5;
+}
+#wfs-root .wfs-nd text {
+  fill: var(--ink);
+  font: 500 14px var(--ui);
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+}
+#wfs-root .wfs-nd.wfs-sel .wfs-sh,
+#wfs-root .wfs-nd.wfs-sel .wfs-sh2 {
+  stroke: var(--sel);
+  stroke-width: 2.5;
+}
+#wfs-root .wfs-nd.wfs-tgt .wfs-sh {
+  stroke: var(--accent);
+  stroke-width: 3;
+}
+#wfs-root .wfs-hd {
+  fill: var(--panel);
+  stroke: var(--accent);
+  stroke-width: 1.5;
+  opacity: 0;
+  cursor: crosshair;
+  transition: opacity 0.12s;
+}
+#wfs-root .wfs-nd:hover .wfs-hd,
+#wfs-root .wfs-nd.wfs-sel .wfs-hd {
+  opacity: 1;
+}
+#wfs-root .wfs-mode-connect .wfs-nd {
+  cursor: crosshair;
+}
+#wfs-root .wfs-ed .wfs-ln {
+  fill: none;
+  stroke: var(--edge);
+  stroke-width: 1.6;
+}
+#wfs-root .wfs-ed.wfs-dotted .wfs-ln {
+  stroke-dasharray: 5 5;
+}
+#wfs-root .wfs-ed.wfs-thick .wfs-ln {
+  stroke-width: 3.4;
+}
+#wfs-root .wfs-ed .wfs-hit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 14;
+  cursor: pointer;
+}
+#wfs-root .wfs-ed.wfs-sel .wfs-ln {
+  stroke: var(--sel);
+}
+#wfs-root .wfs-el rect {
+  fill: var(--bg);
+  stroke: var(--line);
+}
+#wfs-root .wfs-el text {
+  fill: var(--ink);
+  font: 500 12.5px var(--ui);
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+#wfs-root .wfs-el {
+  cursor: pointer;
+}
+#wfs-root .wfs-el.wfs-sel rect {
+  stroke: var(--sel);
+}
+#wfs-root .wfs-mk {
+  fill: var(--edge);
+}
+#wfs-root .wfs-mks {
+  fill: var(--sel);
+}
+#wfs-root .wfs-mkx {
+  stroke: var(--edge);
+  stroke-width: 1.6;
+  fill: none;
+}
+#wfs-root .wfs-mkxs {
+  stroke: var(--sel);
+  stroke-width: 1.6;
+  fill: none;
+}
+#wfs-root .wfs-sg .wfs-sgbox {
+  fill: var(--sg);
+  stroke: var(--sg-stroke);
+  stroke-width: 1.2;
+}
+#wfs-root .wfs-sg .wfs-sgt {
+  fill: var(--muted);
+  font: 700 12px var(--ui);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+#wfs-root .wfs-sg .wfs-sgbar {
+  fill: transparent;
+  cursor: grab;
+}
+#wfs-root .wfs-sg.wfs-sel .wfs-sgbox {
+  stroke: var(--sel);
+  stroke-width: 2;
+}
+#wfs-root .wfs-tmp {
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-dasharray: 6 4;
+  fill: none;
+  pointer-events: none;
+}
+#wfs-root .wfs-marq {
+  fill: color-mix(in srgb, var(--accent) 12%, transparent);
+  stroke: var(--accent);
+  stroke-dasharray: 4 3;
+  pointer-events: none;
+}
+
+/* inline editor */
+#wfs-root .wfs-inl {
+  position: absolute;
+  z-index: 8;
+  resize: none;
+  border: 2px solid var(--accent);
+  border-radius: 6px;
+  background: var(--panel);
+  color: var(--ink);
+  font: 500 14px/18px var(--ui);
+  text-align: center;
+  padding: 6px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+}
+
+/* inspector */
+#wfs-root .wfs-inspector {
+  position: absolute;
+  top: 60px;
+  right: 12px;
+  width: 270px;
+  max-height: calc(100% - 120px);
+  overflow: auto;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.12);
+  padding: 14px;
+  display: grid;
+  gap: 11px;
+  z-index: 6;
+}
+@container wfs (max-width:620px) {
+  #wfs-root .wfs-inspector {
+    left: 12px;
+    right: 12px;
+    width: auto;
+    top: auto;
+    bottom: 56px;
+    max-height: 46%;
+  }
+}
+#wfs-root .wfs-inspector h3 {
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+#wfs-root .wfs-fld {
+  display: grid;
+  gap: 4px;
+}
+#wfs-root .wfs-fld label,
+#wfs-root .wfs-fld .wfs-lbl {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+#wfs-root .wfs-fld input[type='text'],
+#wfs-root .wfs-fld textarea,
+#wfs-root .wfs-fld select {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: 7px;
+  padding: 6px 8px;
+  font-size: 13px;
+}
+#wfs-root .wfs-fld input.wfs-mono {
+  font-family: var(--mono);
+  font-size: 12.5px;
+}
+#wfs-root .wfs-fld .wfs-err {
+  font-size: 12px;
+  color: var(--danger);
+}
+#wfs-root .wfs-segs {
+  display: flex;
+  gap: 2px;
+  background: var(--codebg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 2px;
+  flex-wrap: wrap;
+}
+#wfs-root .wfs-segs button {
+  flex: 1;
+  border: 0;
+  background: none;
+  border-radius: 6px;
+  padding: 5px 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+#wfs-root .wfs-segs button[aria-pressed='true'] {
+  background: var(--panel);
+  box-shadow: 0 0 0 1px var(--accent) inset;
+  color: var(--ink);
+}
+#wfs-root .wfs-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+#wfs-root .wfs-chk {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  font-size: 13px;
+}
+
+/* overlays on the stage */
+#wfs-root .wfs-over {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 7;
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+}
+#wfs-root .wfs-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 22px;
+  max-width: 440px;
+  display: grid;
+  gap: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+}
+#wfs-root .wfs-card h2 {
+  margin: 0;
+  font-size: 20px;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+#wfs-root .wfs-card p {
+  margin: 0;
+  color: var(--muted);
+}
+#wfs-root #wfs-codeOnly {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  z-index: 3;
+  background: var(--bg);
+}
+#wfs-root #wfs-codeOnly .wfs-note {
+  margin: 12px;
+  padding: 10px 14px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  font-size: 13px;
+  color: var(--muted);
+}
+#wfs-root #wfs-codeOnly .wfs-note b {
+  color: var(--ink);
+}
+#wfs-root #wfs-codeOnlyOut {
+  overflow: auto;
+  padding: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* side panel */
+#wfs-root .wfs-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--line);
+  padding-inline: 6px;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+#wfs-root .wfs-tab {
+  border: 0;
+  background: none;
+  padding: 11px 10px 10px;
+  white-space: nowrap;
+  flex: none;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--muted);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+#wfs-root .wfs-tab[aria-selected='true'] {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}
+#wfs-root .wfs-tab .wfs-count {
+  font-size: 11px;
+  background: var(--codebg);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0 6px;
+  margin-left: 4px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+#wfs-root .wfs-panel {
+  min-height: 0;
+  display: grid;
+}
+#wfs-root .wfs-panel[hidden] {
+  display: none;
+}
+#wfs-root #wfs-pCode {
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+#wfs-root #wfs-code {
+  width: 100%;
+  height: 100%;
+  min-height: 260px;
+  border: 0;
+  resize: none;
+  background: var(--codebg);
+  padding: 14px 16px;
+  font: 12.5px/1.6 var(--mono);
+  tab-size: 2;
+  white-space: pre;
+  overflow: auto;
+}
+#wfs-root #wfs-code:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+#wfs-root .wfs-codebar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
+  color: var(--muted);
+}
+#wfs-root .wfs-codebar .wfs-warn {
+  color: var(--sel);
+  font-weight: 600;
+  cursor: help;
+}
+#wfs-root #wfs-pPrev,
+#wfs-root #wfs-pCanvas {
+  overflow: auto;
+}
+#wfs-root #wfs-prevOut,
+#wfs-root #wfs-canvasOut {
+  padding: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 200px;
+}
+#wfs-root #wfs-prevOut svg,
+#wfs-root #wfs-codeOnlyOut svg {
+  max-width: 100%;
+  height: auto;
+}
+#wfs-root .wfs-snap {
+  max-width: 100%;
+  height: auto;
+}
+#wfs-root .wfs-snap * {
+  pointer-events: none;
+}
+#wfs-root .wfs-perr {
+  font: 12.5px/1.5 var(--mono);
+  color: var(--danger);
+  white-space: pre-wrap;
+  background: var(--codebg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  max-width: 100%;
+}
+#wfs-root .wfs-pnote {
+  font-size: 12px;
+  color: var(--muted);
+  padding: 0 18px 14px;
+}
+#wfs-root .wfs-pnote-top {
+  padding: 14px 18px 0;
+  line-height: 1.5;
+}
+#wfs-root .wfs-pnote b {
+  color: var(--ink);
+  font-weight: 600;
+}
+#wfs-root .wfs-mmdbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px 0;
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 600;
+}
+#wfs-root .wfs-mmdbar select {
+  font-size: 12.5px;
+  padding: 3px 6px;
+}
+#wfs-root #wfs-pHist {
+  overflow: auto;
+  align-content: start;
+}
+#wfs-root .wfs-savever {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+  display: grid;
+  gap: 8px;
+}
+#wfs-root .wfs-savever .wfs-row input {
+  flex: 1 1 150px;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 6px 8px;
+  background: var(--panel);
+}
+#wfs-root .wfs-savever .wfs-since {
+  font-size: 12px;
+  color: var(--muted);
+}
+#wfs-root .wfs-vlist {
+  list-style: none;
+  margin: 0;
+  padding: 6px 0;
+}
+#wfs-root .wfs-vlist li {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+  display: grid;
+  gap: 4px;
+}
+#wfs-root .wfs-vhead {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+#wfs-root .wfs-vname {
+  font-weight: 700;
+}
+#wfs-root .wfs-vmeta {
+  font-size: 12px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+#wfs-root .wfs-vnote {
+  font-size: 13px;
+  color: var(--ink);
+  margin: 0;
+}
+#wfs-root .wfs-stat {
+  font: 12px var(--mono);
+}
+#wfs-root .wfs-stat .wfs-a {
+  color: var(--ok);
+}
+#wfs-root .wfs-stat .wfs-d {
+  color: var(--danger);
+}
+#wfs-root .wfs-vlist .wfs-row {
+  margin-top: 4px;
+}
+#wfs-root .wfs-vlist .wfs-btn {
+  padding: 4px 9px;
+  font-size: 12px;
+}
+#wfs-root .wfs-empty-h {
+  padding: 24px 16px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* modal */
+#wfs-root .wfs-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100001;
+  background: rgba(10, 14, 16, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+#wfs-root .wfs-dialog {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  width: min(620px, 100%);
+  max-height: calc(100% - 32px);
+  overflow: auto;
+  padding: 20px;
+  display: grid;
+  gap: 12px;
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.25);
+}
+#wfs-root .wfs-dialog.wfs-wide {
+  width: min(860px, 100%);
+}
+#wfs-root .wfs-dialog h2 {
+  margin: 0;
+  font-size: 18px;
+}
+#wfs-root .wfs-dialog p {
+  margin: 0;
+  color: var(--muted);
+}
+#wfs-root .wfs-dialog textarea {
+  width: 100%;
+  min-height: 200px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--codebg);
+  padding: 10px 12px;
+  font: 12.5px/1.55 var(--mono);
+  resize: vertical;
+}
+#wfs-root .wfs-dialog input[type='text'] {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 7px 9px;
+  background: var(--panel);
+}
+#wfs-root .wfs-dialog .wfs-acts {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+#wfs-root .wfs-info {
+  font-size: 13px;
+  padding: 8px 10px;
+  border-radius: 7px;
+  background: var(--codebg);
+  border: 1px solid var(--line);
+}
+#wfs-root .wfs-info.wfs-bad {
+  color: var(--danger);
+}
+#wfs-root .wfs-starters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px;
+}
+#wfs-root .wfs-starter {
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 10px 12px;
+  background: var(--panel);
+  text-align: left;
+  display: grid;
+  gap: 2px;
+}
+#wfs-root .wfs-starter b {
+  font-size: 13px;
+}
+#wfs-root .wfs-starter span {
+  font-size: 12px;
+  color: var(--muted);
+}
+#wfs-root .wfs-starter[aria-pressed='true'] {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+  background: var(--accent-soft);
+}
+#wfs-root .wfs-diff {
+  font: 12.5px/1.55 var(--mono);
+  background: var(--codebg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: auto;
+  max-height: 60vh;
+}
+#wfs-root .wfs-diff div {
+  padding: 0 12px;
+  white-space: pre;
+}
+#wfs-root .wfs-diff .wfs-a {
+  background: var(--add);
+}
+#wfs-root .wfs-diff .wfs-d {
+  background: var(--del);
+}
+#wfs-root .wfs-diff .wfs-a::before {
+  content: '+ ';
+  color: var(--ok);
+}
+#wfs-root .wfs-diff .wfs-d::before {
+  content: '− ';
+  color: var(--danger);
+}
+#wfs-root .wfs-diff .wfs-s::before {
+  content: '  ';
+}
+#wfs-root .wfs-toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: var(--bg);
+  padding: 9px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 13px;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+  z-index: 100002;
+  max-width: calc(100% - 32px);
+}
+#wfs-root .wfs-toast.wfs-on {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  #wfs-root * {
+    transition: none !important;
+  }
+}

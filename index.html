@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en" class="wfs-page">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Workflow Studio</title>
+<link rel="stylesheet" href="workflow-studio.css">
+</head>
+<body>
+<div id="wfs-root" class="wfs-root wfs-full">
+<div id="wfs-app">
+  <header class="wfs-bar">
+    <div class="wfs-brand"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="3" width="8" height="6" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="15" width="8" height="6" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M6 9v5a3 3 0 0 0 3 3h5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 15l2 2-2 2" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>Workflow Studio</div>
+    <div class="wfs-docpick">
+      <select id="wfs-docSel" aria-label="Open diagram"></select>
+      <input id="wfs-docName" type="text" aria-label="Diagram name" spellcheck="false">
+    </div>
+    <span class="wfs-chip" id="wfs-saveChip" data-s="idle"><i></i><span>Connecting…</span></span>
+    <div class="wfs-bar-actions">
+      <button type="button" class="wfs-btn" id="wfs-bNew">New</button>
+      <button type="button" class="wfs-btn" id="wfs-bImport">Import</button>
+      <button type="button" class="wfs-btn" id="wfs-bExport" aria-haspopup="menu" aria-expanded="false">Export ▾</button>
+      <button type="button" class="wfs-btn" id="wfs-bMore" aria-haspopup="menu" aria-expanded="false" aria-label="More diagram actions">⋯</button>
+      <button type="button" class="wfs-btn wfs-only-embed" id="wfs-bFull" aria-pressed="false" title="Use the whole window">Full screen</button>
+      <button type="button" class="wfs-btn wfs-primary" id="wfs-bSaveVer">Save version</button>
+      <div class="wfs-menu" id="wfs-mExport" role="menu" hidden>
+        <button type="button" role="menuitem" data-x="copy">Copy Mermaid code</button>
+        <button type="button" role="menuitem" data-x="md">Download Markdown (.md)</button>
+        <div class="wfs-sep"></div>
+        <button type="button" role="menuitem" data-x="csvg">Download canvas image (.svg)</button>
+        <button type="button" role="menuitem" data-x="cpng">Download canvas image (.png)</button>
+        <button type="button" role="menuitem" data-x="svg">Download Mermaid image (.svg)</button>
+        <div class="wfs-sep"></div>
+        <button type="button" role="menuitem" data-x="txt">Download code (.txt)</button>
+      </div>
+      <div class="wfs-menu" id="wfs-mMore" role="menu" hidden>
+        <button type="button" role="menuitem" data-m="dup">Duplicate diagram</button>
+        <div class="wfs-sep"></div>
+        <button type="button" role="menuitem" data-m="wsExport">Download all diagrams (.json)</button>
+        <button type="button" role="menuitem" data-m="wsImport">Load diagrams from a .json file…</button>
+        <div class="wfs-sep"></div>
+        <button type="button" role="menuitem" data-m="folder" hidden>Save diagrams to a folder…</button>
+        <button type="button" role="menuitem" data-m="unfolder" hidden>Stop saving to the folder</button>
+        <div class="wfs-sep"></div>
+        <button type="button" role="menuitem" data-m="del" class="wfs-btn wfs-danger" style="border:0">Delete diagram…</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wfs-work">
+    <section class="wfs-stage" id="wfs-stage" aria-label="Diagram canvas">
+      <svg id="wfs-cv" role="img" aria-label="Editable flowchart">
+        <defs>
+          <marker id="wfs-m-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="11" markerHeight="11" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path class="wfs-mk" d="M0,0 L10,5 L0,10 z"/></marker>
+          <marker id="wfs-m-arrow-s" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="11" markerHeight="11" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path class="wfs-mks" d="M0,0 L10,5 L0,10 z"/></marker>
+          <marker id="wfs-m-circle" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="10" markerHeight="10" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><circle class="wfs-mk" cx="5" cy="5" r="4"/></marker>
+          <marker id="wfs-m-circle-s" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="10" markerHeight="10" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><circle class="wfs-mks" cx="5" cy="5" r="4"/></marker>
+          <marker id="wfs-m-cross" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="11" markerHeight="11" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path class="wfs-mkx" d="M2,1 L9,9 M9,1 L2,9"/></marker>
+          <marker id="wfs-m-cross-s" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="11" markerHeight="11" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path class="wfs-mkxs" d="M2,1 L9,9 M9,1 L2,9"/></marker>
+        </defs>
+        <g id="wfs-world"></g>
+        <g id="wfs-fx"></g>
+      </svg>
+
+      <div class="wfs-toolbar" id="wfs-toolbar" role="toolbar" aria-label="Canvas tools">
+        <div class="wfs-seg" role="group" aria-label="Pointer mode">
+          <button type="button" class="wfs-tb" id="wfs-tSelect" aria-pressed="true" title="Select and move (V)">Select</button>
+          <button type="button" class="wfs-tb" id="wfs-tConnect" aria-pressed="false" title="Draw connections between steps (C)">Connect</button>
+        </div>
+        <div class="wfs-grp">
+          <button type="button" class="wfs-tb" id="wfs-tAdd" title="Add a step (N)">+ Step</button>
+          <select class="wfs-tsel" id="wfs-tShape" aria-label="Shape for new steps"></select>
+        </div>
+        <div class="wfs-grp">
+          <button type="button" class="wfs-tb" id="wfs-tGroup" title="Put selected steps in a subgraph (G)">Group</button>
+          <button type="button" class="wfs-tb" id="wfs-tLayout" title="Arrange automatically (L)">Tidy up</button>
+          <select class="wfs-tsel" id="wfs-tDir" aria-label="Flow direction">
+            <option value="TD">Top → bottom</option><option value="LR">Left → right</option>
+            <option value="BT">Bottom → top</option><option value="RL">Right → left</option>
+          </select>
+        </div>
+        <div class="wfs-grp">
+          <button type="button" class="wfs-tb wfs-ic" id="wfs-tUndo" title="Undo (Ctrl+Z)" aria-label="Undo"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7H4V2M4 7a9 9 0 1 1-1.2 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+          <button type="button" class="wfs-tb wfs-ic" id="wfs-tRedo" title="Redo (Ctrl+Shift+Z)" aria-label="Redo"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 7h5V2M20 7a9 9 0 1 0 1.2 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+          <button type="button" class="wfs-tb wfs-ic" id="wfs-tDel" title="Delete selection (Del)" aria-label="Delete selection"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+      </div>
+      <div class="wfs-zoom wfs-grp" aria-label="Zoom">
+        <button type="button" class="wfs-tb" id="wfs-zOut" aria-label="Zoom out">−</button>
+        <button type="button" class="wfs-tb" id="wfs-zReset" title="Reset to 100%">100%</button>
+        <button type="button" class="wfs-tb" id="wfs-zIn" aria-label="Zoom in">+</button>
+        <button type="button" class="wfs-tb" id="wfs-zFit">Fit</button>
+      </div>
+      <div class="wfs-hint" id="wfs-hint">Double-click empty space to add a step. Drag from a dot to connect. Shift-drag to select several. Ctrl-scroll to zoom.</div>
+      <div class="wfs-inspector" id="wfs-insp" hidden></div>
+      <div id="wfs-codeOnly" hidden><div class="wfs-note" id="wfs-codeOnlyNote"></div><div id="wfs-codeOnlyOut"></div></div>
+      <div class="wfs-over" id="wfs-overlay"><div class="wfs-card"><h2>Opening your workflows…</h2><p>Loading saved diagrams.</p></div></div>
+    </section>
+
+    <aside class="wfs-side">
+      <div class="wfs-tabs" role="tablist" aria-label="Diagram views">
+        <button type="button" class="wfs-tab" role="tab" id="wfs-tabCode" aria-selected="true" aria-controls="wfs-pCode">Code</button>
+        <button type="button" class="wfs-tab" role="tab" id="wfs-tabCanvas" aria-selected="false" aria-controls="wfs-pCanvas" title="Your layout exactly as drawn on the canvas">Preview</button>
+        <button type="button" class="wfs-tab" role="tab" id="wfs-tabPrev" aria-selected="false" aria-controls="wfs-pPrev" title="How Mermaid itself lays out the code">Mermaid preview</button>
+        <button type="button" class="wfs-tab" role="tab" id="wfs-tabHist" aria-selected="false" aria-controls="wfs-pHist">History<span class="wfs-count" id="wfs-vCount">0</span></button>
+      </div>
+      <div class="wfs-panel" id="wfs-pCode" role="tabpanel" aria-labelledby="wfs-tabCode">
+        <textarea id="wfs-code" spellcheck="false" aria-label="Mermaid code" autocomplete="off" autocapitalize="off"></textarea>
+        <div class="wfs-codebar"><span id="wfs-codeStatus">—</span><span class="wfs-row"><button type="button" class="wfs-btn" id="wfs-bFormat" title="Rewrite the code in the editor's standard layout">Tidy code</button><button type="button" class="wfs-btn" id="wfs-bCopy">Copy</button></span></div>
+      </div>
+      <div class="wfs-panel" id="wfs-pCanvas" role="tabpanel" aria-labelledby="wfs-tabCanvas" hidden>
+        <div><p class="wfs-pnote wfs-pnote-top"><b>Your layout, exactly as you arranged it on the canvas.</b> Only this editor keeps these positions. To share this exact layout, use <b>Export → Download canvas image</b>.</p><div id="wfs-canvasOut"></div></div>
+      </div>
+      <div class="wfs-panel" id="wfs-pPrev" role="tabpanel" aria-labelledby="wfs-tabPrev" hidden>
+        <div><p class="wfs-pnote wfs-pnote-top"><b>This is how Mermaid itself lays out the code</b>, using Mermaid <span id="wfs-mmdVerName">12.1.0</span> with default settings. Mermaid ignores your canvas positions. Layout changes between Mermaid versions, so to match GitHub, GitLab, Confluence or the Mermaid Live Editor, pick the version that tool runs.</p>
+          <div class="wfs-mmdbar"><label for="wfs-mmdVer">Mermaid version</label><select id="wfs-mmdVer"></select></div><div id="wfs-prevOut"></div></div>
+      </div>
+      <div class="wfs-panel" id="wfs-pHist" role="tabpanel" aria-labelledby="wfs-tabHist" hidden>
+        <div>
+          <div class="wfs-savever" id="wfs-verForm">
+            <div class="wfs-row"><input id="wfs-verName" type="text" placeholder="Version name, e.g. After team review" aria-label="Version name"><button type="button" class="wfs-btn wfs-primary" id="wfs-verSave">Save version</button></div>
+            <input id="wfs-verNote" type="text" placeholder="What changed? (optional)" aria-label="Version note" style="border:1px solid var(--line);border-radius:7px;padding:6px 8px;background:var(--panel)">
+            <div class="wfs-since" id="wfs-verSince"></div>
+          </div>
+          <ul class="wfs-vlist" id="wfs-vList"></ul>
+        </div>
+      </div>
+    </aside>
+  </main>
+</div>
+<div class="wfs-modal" id="wfs-modal" hidden><div class="wfs-dialog" id="wfs-dialog" role="dialog" aria-modal="true"></div></div>
+<div class="wfs-toast" id="wfs-toast" role="status" aria-live="polite"></div>
+</div>
+
+<!-- Diagrams are kept in this browser's storage, or in Chrome and Edge in a folder you choose (⋯ menu). Optional settings go in window.WFS_CONFIG
+     before workflow-studio.js, e.g. <script>window.WFS_CONFIG={theme:'light'}</script> (see README.md). -->
+<script src="workflow-studio.js"></script>
+</body>
+</html>
