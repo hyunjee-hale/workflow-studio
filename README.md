@@ -41,6 +41,14 @@ workflow-studio.css
 workflow-studio.js
 ```
 
+### Using the online version
+
+The [online version](https://hyunjee-hale.github.io/workflow-studio/) is the same app, served by GitHub Pages. GitHub only sends the app's files: your diagrams never leave your computer, and nobody else (including me) can see them.
+
+- **Diagrams are saved in your browser on this device**, for the site `hyunjee-hale.github.io`. They stay between visits, but another browser or computer won't see them. They're also separate from any copy you open from your disk.
+- **Clearing this site's data in your browser deletes them**, and a private or Incognito window discards them when you close it.
+- **For anything you want to keep,** download a backup with **⋯ → Download all diagrams (.json)**, or, in Chrome or Edge, use **⋯ → Save diagrams to a folder…** so each diagram is saved as a `.mmd` file on your computer.
+
 ### Working offline
 
 The page loads two libraries from public CDNs: Dagre (automatic layout) and Mermaid (preview and image export). To work without internet access, download them into a `lib/` folder next to `index.html`:
